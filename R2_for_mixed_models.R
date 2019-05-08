@@ -64,7 +64,7 @@ r2.for.mm<-function(mm.object,round.r2.to=3,rel.dist.fr.top=.025,rel.dist.fr.lef
   ## take fixed effect fitted values (level=0)
   # of random effects levels (for nested data):
   r.levels<-length(ranef(mm.object))
-  if(class(mm.object)[1]=="lmerMod"){
+  if(attr(class(mm.object),"package")=="lme4"){
     fixs<-(model.matrix(mm.object, type = "fixed") %*% fixef(lme4.mod))
   }else{
     fixs<-fitted(mm.object,level=0)
@@ -79,7 +79,7 @@ r2.for.mm<-function(mm.object,round.r2.to=3,rel.dist.fr.top=.025,rel.dist.fr.lef
   rcs.val<-c()
   rcs.lab<-c()
   gg.rcs.lab<-c()
-  if(class(mm.object)[1]=="lmerMod"){
+  if(attr(class(mm.object),"package")=="lme4"){
     ## only return R2 for fixed effects model and full model
     ## too much work to get R2 for each level of random effects
   fit.ran<-fitted(mm.object)
@@ -219,4 +219,4 @@ ggplot(test.data,aes(pred,dep.var))+geom_point(aes(color=SITE))+
   geom_label(data=lab.data,aes(x,y,label=r2.labels),parse=T,hjust=0,color="blue")+
   theme_classic()
 
-
+attr(class(model1),"package")
