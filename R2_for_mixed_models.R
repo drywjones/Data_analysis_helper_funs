@@ -26,7 +26,6 @@ test.data$dep.var<-test.data$dep.var+
                 ifelse(test.data$SITE=="plot3",(sample(1:100,1)/100+5),
                        (sample(1:100,1)/100+2))))
                               
-
 ### functions ####
 
 ## This function is used within the r2.for.mm function to reduce the R2 value
@@ -64,7 +63,8 @@ r2.for.mm<-function(mm.object,round.r2.to=3,rel.dist.fr.top=.025,rel.dist.fr.lef
   ## take fixed effect fitted values (level=0)
   # of random effects levels (for nested data):
   r.levels<-length(ranef(mm.object))
-  if(attr(class(mm.object),"package")=="lme4"){
+  class<-class(mm.object)[1]
+  if(class=="lmerMod"){
     fixs<-(model.matrix(mm.object, type = "fixed") %*% fixef(lme4.mod))
   }else{
     fixs<-fitted(mm.object,level=0)
@@ -79,7 +79,8 @@ r2.for.mm<-function(mm.object,round.r2.to=3,rel.dist.fr.top=.025,rel.dist.fr.lef
   rcs.val<-c()
   rcs.lab<-c()
   gg.rcs.lab<-c()
-  if(attr(class(mm.object),"package")=="lme4"){
+
+  if(class=="lmerMod"){
     ## only return R2 for fixed effects model and full model
     ## too much work to get R2 for each level of random effects
   fit.ran<-fitted(mm.object)
@@ -162,12 +163,16 @@ nlme.mod<-nlme(dep.var~a+b*indep.var,
                fixed=list(a~1,b~1),
                start=c(a=10,b=5),
                data=test.data)
+lme.mod<-lme(dep.var~indep.var,
+               random=~1|SITE/plot,
+               data=test.data)
 
 lme4.mod<-lmer(dep.var~indep.var+(1|SITE/plot),
                data=test.data)
 
+
 ## Pick a model that you want to create R2 values and labels for: ####
-model1<-lme4.mod
+model1<-nlme.mod
 
 ## Create labels:
 r2.labels<-r2.for.mm(model1)
@@ -219,4 +224,3 @@ ggplot(test.data,aes(pred,dep.var))+geom_point(aes(color=SITE))+
   geom_label(data=lab.data,aes(x,y,label=r2.labels),parse=T,hjust=0,color="blue")+
   theme_classic()
 
-attr(class(model1),"package")
